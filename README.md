@@ -1,4 +1,4 @@
-# Next.js starter kit with Appwrite
+# Next.js  with Appwrite
 
 Kickstart your Next.js development with this ready-to-use starter project integrated with [Appwrite](https://www.appwrite.io)
 
@@ -8,7 +8,7 @@ Kickstart your Next.js development with this ready-to-use starter project integr
 Clone the Project
 Clone this repository to your local machine using Git:
 
-`git clone https://github.com/appwrite/starter-for-nextjs`
+`git clone[ https://github.com/appwrite/starter-for-nextjs](https://github.com/BikramSingh2004/overflow/`
 
 ## 🛠️ Development guid
 1. **Configure Appwrite**<br/>
