@@ -1,4 +1,4 @@
-
+"use client";
 import { useAuthStore } from "@/store/Auth";
 import Link from "next/link";
 import { useParams } from "next/navigation";
