@@ -24,7 +24,6 @@
     "framer-motion": "^12.16.0",
     "immer": "^10.1.1",
     "lucide-react": "^0.511.0",
-    "magic-ui": "^0.1.0",
     "next": "^15.3.3",
     "node-appwrite": "^17.0.0",
     "postcss": "^8.5.3",
