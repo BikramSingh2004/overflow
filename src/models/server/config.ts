@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 
 import  env  from "../../app/env";
 

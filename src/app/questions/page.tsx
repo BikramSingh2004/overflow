@@ -1,3 +1,6 @@
+// ✅ Add this to make Node.js features like node-appwrite work
+export const runtime = "nodejs";
+
 import { databases, users } from "@/models/server/config";
 import {
   answerCollection,
