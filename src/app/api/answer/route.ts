@@ -1,4 +1,4 @@
-export const runtime = "node";
+export const runtime = "nodejs";
 
 import { answerCollection, db } from "@/models/name";
 import { databases, users } from "@/models/server/config";

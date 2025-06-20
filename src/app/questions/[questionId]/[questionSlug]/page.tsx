@@ -5,25 +5,27 @@ import { Models } from "appwrite";
 import { Query } from "node-appwrite";
 import QuestionClient from "./QuestionClient"; // 👈 Client Component
 
+// ✅ No need to type params as Promise
 type Props = {
-  params: Promise<{
+  params: {
     questionId: string;
     questionSlug: string;
-  }>;
+  };
 };
 
-export default async function QuestionPage({ params }: Props) {
-  const resolvedParams = await params;
+// ✅ Await props at the top level
+export default async function QuestionPage(props: Promise<Props>) {
+  const { params } = await props;
 
   try {
     const question = await databases.getDocument<Models.Document>(
       db,
       questionCollection,
-      resolvedParams.questionId
+      params.questionId
     );
 
     const answers = await databases.listDocuments(db, answerCollection, [
-      Query.equal("questionId", resolvedParams.questionId),
+      Query.equal("questionId", params.questionId),
       Query.orderDesc("$createdAt"),
     ]);
 
