@@ -1,3 +1,5 @@
+export const runtime = "node";
+
 import { answerCollection, db } from "@/models/name";
 import { databases, users } from "@/models/server/config";
 import { NextRequest, NextResponse } from "next/server";

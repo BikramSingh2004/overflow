@@ -6,22 +6,24 @@ import { Query } from "node-appwrite";
 import QuestionClient from "./QuestionClient"; // 👈 Client Component
 
 type Props = {
-  params: {
+  params: Promise<{
     questionId: string;
     questionSlug: string;
-  };
+  }>;
 };
 
 export default async function QuestionPage({ params }: Props) {
+  const resolvedParams = await params;
+
   try {
     const question = await databases.getDocument<Models.Document>(
       db,
       questionCollection,
-      params.questionId
+      resolvedParams.questionId
     );
 
     const answers = await databases.listDocuments(db, answerCollection, [
-      Query.equal("questionId", params.questionId),
+      Query.equal("questionId", resolvedParams.questionId),
       Query.orderDesc("$createdAt"),
     ]);
 

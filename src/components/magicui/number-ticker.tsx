@@ -32,7 +32,7 @@ export default function NumberTicker({
     }, [motionValue, isInView, delay, value, direction]);
 
    useEffect(() => {
-    const unsubscribe = springValue.onChange((latest: number) => {
+    const unsubscribe = springValue.on("change",(latest: number) => {
         if (ref.current) {
             ref.current.textContent = Intl.NumberFormat("en-US").format(
                 latest.toFixed(0)

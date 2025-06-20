@@ -1,4 +1,4 @@
-// ✅ Add this to make Node.js features like node-appwrite work
+// ✅ Add this to enable Node.js APIs in App Router
 export const runtime = "nodejs";
 
 import { databases, users } from "@/models/server/config";
@@ -17,14 +17,15 @@ import { UserPrefs } from "@/store/Auth";
 import Pagination from "@/components/Pagination";
 import Search from "./Search";
 
-export default async function Page(props: {
-  searchParams: { page?: string; tag?: string; search?: string };
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; tag?: string; search?: string }>;
 }) {
-  const searchParams = await props.searchParams; // ✅ REQUIRED for RSC
-
-  const page = Number(searchParams?.page || "1");
-  const tag = searchParams?.tag;
-  const search = searchParams?.search;
+  const resolvedSearchParams = await searchParams;
+  const page = Number(resolvedSearchParams?.page || "1");
+  const tag = resolvedSearchParams?.tag;
+  const search = resolvedSearchParams?.search;
 
   const queries = [
     Query.orderDesc("$createdAt"),
@@ -33,15 +34,20 @@ export default async function Page(props: {
   ];
 
   if (tag) queries.push(Query.equal("tags", tag));
-  if (search)
+  if (search) {
     queries.push(
       Query.or([
         Query.search("title", search),
         Query.search("content", search),
       ])
     );
+  }
 
-  const questions = await databases.listDocuments(db, questionCollection, queries);
+  const questions = await databases.listDocuments(
+    db,
+    questionCollection,
+    queries
+  );
 
   questions.documents = await Promise.all(
     questions.documents.map(async (ques) => {
@@ -97,6 +103,4 @@ export default async function Page(props: {
       <Pagination total={questions.total} limit={25} />
     </div>
   );
-};
-
-// export default Page;
+}
