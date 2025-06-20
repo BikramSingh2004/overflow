@@ -13,10 +13,12 @@ type Props = {
   };
 };
 
-// ✅ Await props at the top level
-export default async function QuestionPage(props: Promise<Props>) {
-  const { params } = await props;
 
+// ✅ Await props at the top level
+// export default async function QuestionPage(props: Promise<Props>) {
+//   const { params } = await props;
+export default async function QuestionPage({ params }: Props) {
+  const { questionId, questionSlug } = params;
   try {
     const question = await databases.getDocument<Models.Document>(
       db,
