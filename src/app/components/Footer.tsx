@@ -1,6 +1,8 @@
 import React from "react";
 import AnimatedGridPattern from "@/components/magicui/animated-grid-pattern";
-import { cn } from "@/utils/cn";
+// import { cn } from "@/utils/cn";
+import { cn } from "@/utils";
+
 import Link from "next/link";
 
 const Footer = () => {

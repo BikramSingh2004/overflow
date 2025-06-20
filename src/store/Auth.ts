@@ -62,31 +62,39 @@ export const useAuthStore = create<IAuthStore>()(
       },
 
       async login(email: string, password: string) {
-        try {
-          const session = await account.createEmailPasswordSession(email, password)
-          const [user, {jwt}] = await Promise.all([
-            account.get<UserPrefs>(),
-            account.createJWT()
+  try {
+    // 👇 logout any previous session to prevent session conflict
+    try {
+      await account.deleteSession("current");
+    } catch (err) {
+      // no-op if there's no session
+      console.log("⚠️ No existing session to delete:", err);
+    }
 
-          ])
-          if (!user.prefs?.reputation) await account.updatePrefs<UserPrefs>({
-            reputation: 0
-          })
+    // 👇 this is correct for Appwrite 13.x
+    const session = await account.createEmailSession(email, password);
 
-          set({session, user, jwt})
-          
-          return { success: true}
+    const [user, { jwt }] = await Promise.all([
+      account.get<UserPrefs>(),
+      account.createJWT(),
+    ]);
 
-        } catch (error) {
+    if (!user.prefs?.reputation) {
+      await account.updatePrefs<UserPrefs>({ reputation: 0 });
+    }
 
-          console.log(error)
-          return {
-            success: false,
-            error: error instanceof AppwriteException ? error: null,
-            
-          }
-        }
-      },
+    set({ session, user, jwt });
+    return { success: true };
+
+  } catch (error) {
+    console.log("❌ Login error:", error);
+    return {
+      success: false,
+      error: error instanceof AppwriteException ? error : null,
+    };
+  }
+},
+
 
       async createAccount(name:string, email: string, password: string) {
         try {

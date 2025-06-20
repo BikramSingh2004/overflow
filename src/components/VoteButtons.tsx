@@ -18,12 +18,14 @@ const VoteButtons = ({
 }: {
     type: "question" | "answer";
     id: string;
-    upvotes: Models.DocumentList<Models.Document>;
-    downvotes: Models.DocumentList<Models.Document>;
+    upvotes?: Models.DocumentList<Models.Document>; // marked optional
+    downvotes?: Models.DocumentList<Models.Document>; // marked optional
     className?: string;
 }) => {
-    const [votedDocument, setVotedDocument] = React.useState<Models.Document | null>(); // undefined means not fetched yet
-    const [voteResult, setVoteResult] = React.useState<number>(upvotes.total - downvotes.total);
+    const [votedDocument, setVotedDocument] = React.useState<Models.Document | null>(); // undefined = loading
+    const [voteResult, setVoteResult] = React.useState<number>(
+        (upvotes?.total ?? 0) - (downvotes?.total ?? 0)
+    );
 
     const { user } = useAuthStore();
     const router = useRouter();
@@ -43,7 +45,6 @@ const VoteButtons = ({
 
     const toggleUpvote = async () => {
         if (!user) return router.push("/login");
-
         if (votedDocument === undefined) return;
 
         try {
@@ -58,7 +59,6 @@ const VoteButtons = ({
             });
 
             const data = await response.json();
-
             if (!response.ok) throw data;
 
             setVoteResult(() => data.data.voteResult);
@@ -70,7 +70,6 @@ const VoteButtons = ({
 
     const toggleDownvote = async () => {
         if (!user) return router.push("/login");
-
         if (votedDocument === undefined) return;
 
         try {
@@ -85,7 +84,6 @@ const VoteButtons = ({
             });
 
             const data = await response.json();
-
             if (!response.ok) throw data;
 
             setVoteResult(() => data.data.voteResult);
@@ -100,7 +98,7 @@ const VoteButtons = ({
             <button
                 className={cn(
                     "flex h-10 w-10 items-center justify-center rounded-full border p-1 duration-200 hover:bg-white/10",
-                    votedDocument && votedDocument.voteStatus === "upvoted"
+                    votedDocument?.voteStatus === "upvoted"
                         ? "border-orange-500 text-orange-500"
                         : "border-white/30"
                 )}
@@ -112,7 +110,7 @@ const VoteButtons = ({
             <button
                 className={cn(
                     "flex h-10 w-10 items-center justify-center rounded-full border p-1 duration-200 hover:bg-white/10",
-                    votedDocument && votedDocument.voteStatus === "downvoted"
+                    votedDocument?.voteStatus === "downvoted"
                         ? "border-orange-500 text-orange-500"
                         : "border-white/30"
                 )}

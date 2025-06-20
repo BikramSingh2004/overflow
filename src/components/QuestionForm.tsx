@@ -35,11 +35,6 @@ const LabelInputContainer = ({
     );
 };
 
-/**
- * ******************************************************************************
- * ![INFO]: for buttons, refer to https://ui.aceternity.com/components/tailwindcss-buttons
- * ******************************************************************************
- */
 const QuestionForm = ({ question }: { question?: Models.Document }) => {
     const { user } = useAuthStore();
     const [tag, setTag] = React.useState("");
@@ -48,7 +43,7 @@ const QuestionForm = ({ question }: { question?: Models.Document }) => {
     const [formData, setFormData] = React.useState({
         title: String(question?.title || ""),
         content: String(question?.content || ""),
-        authorId: user?.$id,
+        authorId: "", // default empty
         tags: new Set((question?.tags || []) as string[]),
         attachment: null as File | null,
     });
@@ -56,33 +51,22 @@ const QuestionForm = ({ question }: { question?: Models.Document }) => {
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState("");
 
+    React.useEffect(() => {
+        if (user?.$id) {
+            setFormData(prev => ({ ...prev, authorId: user.$id }));
+        }
+    }, [user]);
+
     const loadConfetti = (timeInMS = 3000) => {
-        const end = Date.now() + timeInMS; // 3 seconds
+        const end = Date.now() + timeInMS;
         const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"];
 
         const frame = () => {
             if (Date.now() > end) return;
-
-            Confetti({
-                particleCount: 2,
-                angle: 60,
-                spread: 55,
-                startVelocity: 60,
-                origin: { x: 0, y: 0.5 },
-                colors: colors,
-            });
-            Confetti({
-                particleCount: 2,
-                angle: 120,
-                spread: 55,
-                startVelocity: 60,
-                origin: { x: 1, y: 0.5 },
-                colors: colors,
-            });
-
+            Confetti({ particleCount: 2, angle: 60, spread: 55, startVelocity: 60, origin: { x: 0, y: 0.5 }, colors });
+            Confetti({ particleCount: 2, angle: 120, spread: 55, startVelocity: 60, origin: { x: 1, y: 0.5 }, colors });
             requestAnimationFrame(frame);
         };
-
         frame();
     };
 
@@ -139,161 +123,117 @@ const QuestionForm = ({ question }: { question?: Models.Document }) => {
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // didn't check for attachment because it's optional in updating
         if (!formData.title || !formData.content || !formData.authorId) {
             setError(() => "Please fill out all fields");
             return;
         }
 
-        setLoading(() => true);
-        setError(() => "");
+        setLoading(true);
+        setError("");
 
         try {
             const response = question ? await update() : await create();
-
             router.push(`/questions/${response.$id}/${slugify(formData.title)}`);
         } catch (error: any) {
             setError(() => error.message);
         }
 
-        setLoading(() => false);
+        setLoading(false);
     };
+
+    if (!user) {
+        return (
+            <div className="text-center py-10 text-red-500 font-semibold">
+                Please login to ask or update a question.
+            </div>
+        );
+    }
 
     return (
         <form className="space-y-4" onSubmit={submit}>
             {error && (
                 <LabelInputContainer>
-                    <div className="text-center">
-                        <span className="text-red-500">{error}</span>
-                    </div>
+                    <div className="text-center text-red-500">{error}</div>
                 </LabelInputContainer>
             )}
             <LabelInputContainer>
-                <Label htmlFor="title">
-                    Title Address
-                    <br />
-                    <small>
-                        Be specific and imagine you&apos;re asking a question to another person.
-                    </small>
-                </Label>
+                <Label htmlFor="title">Title</Label>
                 <Input
                     id="title"
-                    name="title"
-                    placeholder="e.g. Is there an R function for finding the index of an element in a vector?"
-                    type="text"
                     value={formData.title}
                     onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="e.g. How to find index in R?"
                 />
             </LabelInputContainer>
             <LabelInputContainer>
-                <Label htmlFor="content">
-                    What are the details of your problem?
-                    <br />
-                    <small>
-                        Introduce the problem and expand on what you put in the title. Minimum 20
-                        characters.
-                    </small>
-                </Label>
+                <Label htmlFor="content">Details</Label>
                 <RTE
                     value={formData.content}
                     onChange={value => setFormData(prev => ({ ...prev, content: value || "" }))}
                 />
             </LabelInputContainer>
             <LabelInputContainer>
-                <Label htmlFor="image">
-                    Image
-                    <br />
-                    <small>
-                        Add image to your question to make it more clear and easier to understand.
-                    </small>
-                </Label>
+                <Label htmlFor="image">Image</Label>
                 <Input
                     id="image"
-                    name="image"
-                    accept="image/*"
-                    placeholder="e.g. Is there an R function for finding the index of an element in a vector?"
                     type="file"
+                    accept="image/*"
                     onChange={e => {
-                        const files = e.target.files;
-                        if (!files || files.length === 0) return;
-                        setFormData(prev => ({
-                            ...prev,
-                            attachment: files[0],
-                        }));
+                        const file = e.target.files?.[0];
+                        if (file) setFormData(prev => ({ ...prev, attachment: file }));
                     }}
                 />
             </LabelInputContainer>
             <LabelInputContainer>
-                <Label htmlFor="tag">
-                    Tags
-                    <br />
-                    <small>
-                        Add tags to describe what your question is about. Start typing to see
-                        suggestions.
-                    </small>
-                </Label>
-                <div className="flex w-full gap-4">
-                    <div className="w-full">
-                        <Input
-                            id="tag"
-                            name="tag"
-                            placeholder="e.g. (java c objective-c)"
-                            type="text"
-                            value={tag}
-                            onChange={e => setTag(() => e.target.value)}
-                        />
-                    </div>
+                <Label htmlFor="tag">Tags</Label>
+                <div className="flex gap-2">
+                    <Input
+                        id="tag"
+                        value={tag}
+                        onChange={e => setTag(e.target.value)}
+                        placeholder="e.g. javascript"
+                    />
                     <button
-                        className="relative shrink-0 rounded-full border border-slate-600 bg-slate-700 px-8 py-2 text-sm text-white transition duration-200 hover:shadow-2xl hover:shadow-white/[0.1]"
                         type="button"
                         onClick={() => {
-                            if (tag.length === 0) return;
-                            setFormData(prev => ({
-                                ...prev,
-                                tags: new Set([...Array.from(prev.tags), tag]),
-                            }));
-                            setTag(() => "");
+                            if (tag.trim()) {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    tags: new Set([...Array.from(prev.tags), tag.trim()]),
+                                }));
+                                setTag("");
+                            }
                         }}
+                        className="rounded bg-slate-700 px-4 py-2 text-white text-sm"
                     >
-                        <div className="absolute inset-x-0 -top-px mx-auto h-px w-1/2 bg-gradient-to-r from-transparent via-teal-500 to-transparent shadow-2xl" />
-                        <span className="relative z-20">Add</span>
+                        Add
                     </button>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pt-2">
                     {Array.from(formData.tags).map((tag, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                            <div className="group relative inline-block rounded-full bg-slate-800 p-px text-xs font-semibold leading-6 text-white no-underline shadow-2xl shadow-zinc-900">
-                                <span className="absolute inset-0 overflow-hidden rounded-full">
-                                    <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                                </span>
-                                <div className="relative z-10 flex items-center space-x-2 rounded-full bg-zinc-950 px-4 py-0.5 ring-1 ring-white/10">
-                                    <span>{tag}</span>
-                                    <button
-                                        onClick={() => {
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                tags: new Set(
-                                                    Array.from(prev.tags).filter(t => t !== tag)
-                                                ),
-                                            }));
-                                        }}
-                                        type="button"
-                                    >
-                                        <IconX size={12} />
-                                    </button>
-                                </div>
-                                <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
-                            </div>
-                        </div>
+                        <span key={index} className="bg-slate-800 px-3 py-1 rounded-full flex items-center gap-2">
+                            {tag}
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        tags: new Set(Array.from(prev.tags).filter(t => t !== tag)),
+                                    }))
+                                }
+                            >
+                                <IconX size={12} />
+                            </button>
+                        </span>
                     ))}
                 </div>
             </LabelInputContainer>
             <button
-                className="inline-flex h-12 animate-shimmer items-center justify-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
                 type="submit"
                 disabled={loading}
+                className="rounded bg-orange-500 px-6 py-3 text-white hover:bg-orange-600"
             >
-                {question ? "Update" : "Publish"}
+                {question ? "Update Question" : "Post Question"}
             </button>
         </form>
     );

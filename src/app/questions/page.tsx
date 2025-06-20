@@ -17,14 +17,14 @@ import { UserPrefs } from "@/store/Auth";
 import Pagination from "@/components/Pagination";
 import Search from "./Search";
 
-const Page = async ({
-  searchParams,
-}: {
+export default async function Page(props: {
   searchParams: { page?: string; tag?: string; search?: string };
-}) => {
-  const page = Number(searchParams.page || "1");
-  const tag = searchParams.tag;
-  const search = searchParams.search;
+}) {
+  const searchParams = await props.searchParams; // ✅ REQUIRED for RSC
+
+  const page = Number(searchParams?.page || "1");
+  const tag = searchParams?.tag;
+  const search = searchParams?.search;
 
   const queries = [
     Query.orderDesc("$createdAt"),
@@ -99,4 +99,4 @@ const Page = async ({
   );
 };
 
-export default Page;
+// export default Page;
