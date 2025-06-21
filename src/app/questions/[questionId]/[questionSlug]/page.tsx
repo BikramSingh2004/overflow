@@ -5,22 +5,13 @@ import { Models } from "appwrite";
 import { Query } from "node-appwrite";
 import QuestionClient from "./QuestionClient"; // 👈 Client Component
 
-// ✅ No need to type params as Promise
-type Props = {
-  params: {
-    questionId: string;
-    questionSlug: string;
-  };
-};
-
-
-// ✅ Await props at the top level
-// export default async function QuestionPage(props: Promise<Props>) {
-//   const { params } = await props;
-// export default async function QuestionPageActual({ params }: Props) {
-//
-export default async function QuestionPage({ params }: Props) {
-  const { questionId, questionSlug } = params;
+// ✅ Correct function signature (no Promise in type)
+export default async function QuestionPage({
+  params,
+}: {
+  params: { questionId: string; questionSlug: string };
+}) {
+  const { questionId } = params;
 
   try {
     const question = await databases.getDocument<Models.Document>(

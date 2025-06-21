@@ -9,21 +9,18 @@ import {
 import { databases, users } from "@/models/server/config";
 import { UserPrefs } from "@/store/Auth";
 import { Query } from "node-appwrite";
-import React from "react";
 
-// ✅ Needed for using Appwrite SDK in App Router
+// ✅ Enable server-side runtime for Appwrite SDK
 export const runtime = "nodejs";
 
-const Page = async ({
-  params: rawParams,
-  searchParams: rawSearchParams,
+// ✅ Props typed according to Next.js App Router (no Promise)
+export default async function Page({
+  params,
+  searchParams,
 }: {
-  params: Promise<{ userId: string; userSlug: string }>;
-  searchParams: Promise<{ page?: string }>;
-}) => {
-  const params = await rawParams;
-  const searchParams = await rawSearchParams;
-
+  params: { userId: string; userSlug: string };
+  searchParams: { page?: string };
+}) {
   const page = Number(searchParams.page || "1");
 
   const queries = [
@@ -76,6 +73,4 @@ const Page = async ({
       <Pagination total={questions.total} limit={25} />
     </div>
   );
-};
-
-export default Page;
+}

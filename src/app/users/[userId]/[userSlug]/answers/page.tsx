@@ -7,20 +7,17 @@ import Link from "next/link";
 import { Query } from "node-appwrite";
 import React from "react";
 
-// ✅ Add this if needed (to enable Appwrite/Node.js APIs in App Router)
+// ✅ Enable Node.js APIs for Appwrite usage
 export const runtime = "nodejs";
 
-const Page = async ({
-  params: rawParams,
-  searchParams: rawSearchParams,
+export default async function Page({
+  params,
+  searchParams,
 }: {
-  params: Promise<{ userId: string; userSlug: string }>;
-  searchParams: Promise<{ page?: string }>;
-}) => {
-  const params = await rawParams;
-  const searchParams = await rawSearchParams;
-
-  const page = Number(searchParams?.page || "1");
+  params: { userId: string; userSlug: string };
+  searchParams: { page?: string };
+}) {
+  const page = Number(searchParams.page || "1");
 
   const queries = [
     Query.equal("authorId", params.userId),
@@ -58,7 +55,7 @@ const Page = async ({
               href={`/questions/${ans.questionId}/${slugify(ans.question.title)}`}
               className="mt-3 inline-block shrink-0 rounded bg-orange-500 px-4 py-2 font-bold text-white hover:bg-orange-600"
             >
-              Question
+              View Question
             </Link>
           </div>
         ))}
@@ -66,6 +63,4 @@ const Page = async ({
       <Pagination total={answers.total} limit={25} />
     </div>
   );
-};
-
-export default Page;
+}

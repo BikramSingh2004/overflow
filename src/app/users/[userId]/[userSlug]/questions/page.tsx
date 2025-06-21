@@ -1,25 +1,26 @@
 import Pagination from "@/components/Pagination";
 import QuestionCard from "@/components/QuestionCard";
-import { answerCollection, db, questionCollection, voteCollection } from "@/models/name";
+import {
+  answerCollection,
+  db,
+  questionCollection,
+  voteCollection,
+} from "@/models/name";
 import { databases, users } from "@/models/server/config";
 import { UserPrefs } from "@/store/Auth";
 import { Query } from "node-appwrite";
-import React from "react";
 
-// ✅ Enable server-side Node.js environment (needed for Appwrite SDK)
+// ✅ Enable server-side runtime for Appwrite
 export const runtime = "nodejs";
 
-const Page = async ({
-  params: rawParams,
-  searchParams: rawSearchParams,
+export default async function Page({
+  params,
+  searchParams,
 }: {
-  params: Promise<{ userId: string; userSlug: string }>;
-  searchParams: Promise<{ page?: string }>;
-}) => {
-  const params = await rawParams;
-  const searchParams = await rawSearchParams;
-
-  const page = Number(searchParams?.page || "1");
+  params: { userId: string; userSlug: string };
+  searchParams: { page?: string };
+}) {
+  const page = Number(searchParams.page || "1");
 
   const queries = [
     Query.equal("authorId", params.userId),
@@ -71,6 +72,4 @@ const Page = async ({
       <Pagination total={questions.total} limit={25} />
     </div>
   );
-};
-
-export default Page;
+}
