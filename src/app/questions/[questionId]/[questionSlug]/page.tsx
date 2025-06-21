@@ -19,8 +19,9 @@ type Props = {
 //   const { params } = await props;
 // export default async function QuestionPageActual({ params }: Props) {
 //
-export default async function QuestionPage({ params }: Props) {
-  const { questionId, questionSlug } = params;
+export default async function QuestionPage(props: Promise<Props>) {
+  const { params } = await props;
+
   try {
     const question = await databases.getDocument<Models.Document>(
       db,
