@@ -19,18 +19,18 @@ type Props = {
 //   const { params } = await props;
 // export default async function QuestionPageActual({ params }: Props) {
 //
-export default async function QuestionPage(props: Promise<Props>) {
-  const { params } = await props;
+export default async function QuestionPage({ params }: Props) {
+  const { questionId, questionSlug } = params;
 
   try {
     const question = await databases.getDocument<Models.Document>(
       db,
       questionCollection,
-      params.questionId
+      questionId
     );
 
     const answers = await databases.listDocuments(db, answerCollection, [
-      Query.equal("questionId", params.questionId),
+      Query.equal("questionId", questionId),
       Query.orderDesc("$createdAt"),
     ]);
 
