@@ -1,4 +1,3 @@
-// ✅ Add this to enable Node.js APIs in App Router
 export const runtime = "nodejs";
 
 import { databases, users } from "@/models/server/config";
@@ -20,12 +19,11 @@ import Search from "./Search";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; tag?: string; search?: string }>;
+  searchParams: { page?: string; tag?: string; search?: string };
 }) {
-  const resolvedSearchParams = await searchParams;
-  const page = Number(resolvedSearchParams?.page || "1");
-  const tag = resolvedSearchParams?.tag;
-  const search = resolvedSearchParams?.search;
+  const page = Number(searchParams?.page || "1");
+  const tag = searchParams?.tag;
+  const search = searchParams?.search;
 
   const queries = [
     Query.orderDesc("$createdAt"),
