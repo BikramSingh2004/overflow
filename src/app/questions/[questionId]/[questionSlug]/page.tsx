@@ -1,11 +1,12 @@
+export const runtime = "nodejs"; // ✅ Important if using Appwrite
+
 import { db, questionCollection, answerCollection } from "@/models/name";
 import { databases } from "@/models/server/config";
 import { notFound } from "next/navigation";
 import { Models } from "appwrite";
 import { Query } from "node-appwrite";
-import QuestionClient from "./QuestionClient"; // 👈 Client Component
+import QuestionClient from "./QuestionClient";
 
-// ✅ Correct function signature (no Promise in type)
 export default async function QuestionPage({
   params,
 }: {
