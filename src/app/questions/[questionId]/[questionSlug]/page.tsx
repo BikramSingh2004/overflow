@@ -7,11 +7,10 @@ import { Models } from "appwrite";
 import { Query } from "node-appwrite";
 import QuestionClient from "./QuestionClient";
 
-export default async function QuestionPage({
-  params,
-}: {
-  params: { questionId: string; questionSlug: string };
-}) {
+export default async function QuestionPage(
+  props: Promise<{ params: { questionId: string; questionSlug: string } }>
+) {
+  const { params } = await props;
   const { questionId } = params;
 
   try {
@@ -26,12 +25,7 @@ export default async function QuestionPage({
       Query.orderDesc("$createdAt"),
     ]);
 
-    return (
-      <QuestionClient
-        question={question}
-        answers={answers}
-      />
-    );
+    return <QuestionClient question={question} answers={answers} />;
   } catch (err) {
     console.error("Failed to load question:", err);
     return notFound();

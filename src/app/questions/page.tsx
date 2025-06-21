@@ -16,11 +16,13 @@ import { UserPrefs } from "@/store/Auth";
 import Pagination from "@/components/Pagination";
 import Search from "./Search";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: { page?: string; tag?: string; search?: string };
-}) {
+export default async function Page(
+  props: Promise<{
+    searchParams: { page?: string; tag?: string; search?: string };
+  }>
+) {
+  const { searchParams } = await props;
+
   const page = Number(searchParams?.page || "1");
   const tag = searchParams?.tag;
   const search = searchParams?.search;
